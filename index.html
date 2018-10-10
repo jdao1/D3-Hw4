@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>D3 Choropleth</title>
+        <title>D3 example</title>
         <script src="https://d3js.org/d3.v5.min.js"></script>
 
         <style type="text/css">
@@ -24,29 +24,18 @@
         
         <script type="text/javascript">
 
-            var myData = [
-             {
-               "Damage_Descp": 2010,
-               "Prj": 310
-             },
-             {
-               "Damage_Descp": 2020,
-               "Prj": 326
-             },
-             {
-               "Damage_Descp": 2030,
-               "Prj": 350
-             },
-             {
-               "Damage_Descp": 2040,
-               "Prj": 380
-             },
-             {
-               "Damage_Descp": 2050,
-               "Prj": 390
-             }
-            ];
+            var myData;
 
+            function loadData()
+            {
+              d3.csv("https://raw.githubusercontent.com/jdao1/VegaHW3/master/2015_Convert.csv")
+                .then(function(data)
+              {
+                myData = data;
+                createBarChart();
+              });
+            }
+          
             function createBarChart() {
 
               var svg = d3.select("body")
@@ -56,7 +45,7 @@
 
               // generate bars
               svg.selectAll("rect")
-                  .2(myData)
+                  .data(myData)
                   .enter()
                   .append("rect")
                   .attr("x", 50)
@@ -67,12 +56,12 @@
                   .attr("height", 20)
                   .attr("width", function(d, i)
                     {
-                      return d.Prj;
+                      return d.Amount;
                     })
                   .attr("class", "myrect");
 
               // generate labels
-              svg.selectAll("text.year")
+              svg.selectAll("text.Damage_Descp")
                   .data(myData)
                   .enter()
                   .append("text")
@@ -80,7 +69,7 @@
                     {
                       return d.Damage_Descp;
                     })
-                  .attr("x", 10)
+                  .attr("x", 5)
                   .attr("y", function(d, i)
                     {
                       return (i+1)*(20+2) + 15;
@@ -104,10 +93,23 @@
                     {
                       return (i+1)*(20+2) + 15;
                     });
+              var map = d3.geomap.choropleth()
+                  .geofile('/us-10m.json')
+                 .projection(d3.geo.albersUsa)
+                  .column('2012')
+                 .unitId('fips')
+                  .scale(1000)
+                 .legend(true);
+
+                 d3.csv("https://raw.githubusercontent.com/jdao1/VegaHW3/master/2015_Convert.csv", function(error, data) {
+                  d3.select('#map')
+                  .datum(data)
+                  call(map.draw, map);
+                  });
 
             }
 
-            window.onload = createBarChart;
+            window.onload = loadData;
 
         </script>
 
